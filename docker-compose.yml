@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  address-service:
+    image: address-api
+    build: .
+    ports:
+      - "8000:8000"
