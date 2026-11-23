@@ -1,53 +1,29 @@
-# Address Detection API
+# Thai Address Detection API
 
-## Detail 
- first intern 2 month project
- Detect Address from Text
- program find province, amphoe, district, zipcode, name, phone
+English | [ภาษาไทย](README.th.md)
 
-## Program Process 
- Program INPUT <= 
- ``` 
-  {
-    "text": "อนงค์ลักษณ์\n9/56 ม.3\nหมู่บ้านนฤมลศิริ(ซอย2)\nซ.บุญศิริ ถ.สุขุมวิท\nต.บางเมือง\nอ.เมืองสมุทรปราการ\nจ.สมุทรปนาการ\n10270\nโทร.0956029655"
-  }  
- ```
+Turn free-form Thai address text into structured fields with a dictionary-based FastAPI service. This is the rule-based version: it uses PyThaiNLP and reference address data rather than a transformer model.
 
- Program PROCESS 
- ``` 
- get text -> tokenize -> spellcheck -> matching
-  *custom tokenize and spellcheck base on Dict Tire 
-  **matching find address province amphoe tambol base on address_list file 
- ```  
- Program OUTPUT =>
- ``` 
-  {
-    "address": {
-      "province": "สมุทรปราการ",
-      "amphoe": "เมืองสมุทรปราการ",
-      "district": "บางเมือง",
-      "zipcode": "10270",
-      "name": "",
-      "phone": "0956029655"
-    }
-  }  
- ```
+## Quick start
 
-## Build Docker
- ``` 
- docker build -t address-api:v1 .
- docker run -p 8000:8000 --name address-service address-api:v1 
- ```
- or
- ``` 
- docker compose up 
- ```  
+From the repository root, run:
 
-## How to use
- 1. before run program
- 2. go to 127.0.0.1/docs
- 3. POST box /address-check
-    sent Request body format
-    { "text": "Enter address text" }
- 4. Execute btn
+```bash
+docker compose up --build
+```
 
+Open [Swagger UI](http://localhost:8000/docs) and try `POST /address-check` with this synthetic request:
+
+```json
+{"text":"ต.สุเทพ อ.เมืองเชียงใหม่ จ.เชียงใหม่ 50200"}
+```
+
+The response wraps the extracted fields in `address`: `province`, `amphoe` (district), `district` (subdistrict), `zipcode`, `name`, and `phone`. Results depend on the input and available reference data; sample outputs are not delivery guarantees.
+
+## How it works
+
+[The tagging pipeline](thaiAddressTag/tag.py) tokenizes Thai text, checks spelling against a custom dictionary, and matches candidate locations against [the reference list](thaiAddressTag/addresses.py). [The API entry point](main.py) also runs locally with Python 3.11 after installing [`requirements.txt`](requirements.txt): `python main.py`.
+
+See the [companion notebook](https://github.com/ffe111/thaiAddressTag) for the underlying approach, or the [transformer-based API](https://github.com/ffe111/thai_addr_dt) for a different implementation. When reporting an extraction issue, use a synthetic example rather than a real name, phone number, or address.
+
+<!-- Maintainers: Update the English README first, then mirror the change in README.th.md. -->
